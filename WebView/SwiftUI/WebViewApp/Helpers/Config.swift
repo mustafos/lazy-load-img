@@ -8,6 +8,6 @@
 import SwiftUI
 
 enum Config {
-    static let appId = "id666666668"
-    static let uniqueKey = "xzHEvYwbEeF9xVcVGoGNFE"
+    static let appId = "666666668"
+    static let appsflyerDevKey = "xzHEvYwbEeF9xVcVGoGNFE"
 }

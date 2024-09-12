@@ -9,7 +9,6 @@ import SwiftUI
 
 struct LaunchView: View {
     @State private var ballOffset: CGFloat = -100
-    @State private var isBouncing = false
     
     var body: some View {
         VStack {

@@ -9,29 +9,35 @@ import SwiftUI
 import WebKit
 
 struct WebView: UIViewRepresentable {
-    let urlString: String
+    var urlString: String
     
     func makeUIView(context: Context) -> WKWebView {
-        // Creating WKWebpagePreferences to enable JavaScript
-        let preferences = WKWebpagePreferences()
-        preferences.allowsContentJavaScript = true // Enable JavaScript in the web page
-        
-        // Configuring WKWebView
-        let configuration = WKWebViewConfiguration()
-        configuration.defaultWebpagePreferences = preferences // Apply preferences for JavaScript
-        configuration.websiteDataStore = WKWebsiteDataStore.default() // Enable third-party cookies
-        
-        // Initializing WKWebView with the specified configuration
-        let webView = WKWebView(frame: .zero, configuration: configuration)
-        webView.allowsBackForwardNavigationGestures = true // Allow swipe gestures for back/forward navigation
-        
+        let webConfiguration = WKWebViewConfiguration()
+        webConfiguration.websiteDataStore = .default()
+        let webView = WKWebView(frame: .zero, configuration: webConfiguration)
+        webView.navigationDelegate = context.coordinator
         return webView
     }
     
-    func updateUIView(_ webView: WKWebView, context: Context) {
-        // Load the provided URL if it's valid
+    func updateUIView(_ uiView: WKWebView, context: Context) {
         if let url = URL(string: urlString) {
-            webView.load(URLRequest(url: url)) // Load the URL request in the web view
+            let request = URLRequest(url: url)
+            uiView.load(request)
+        }
+    }
+    
+    func makeCoordinator() -> Coordinator {
+        Coordinator()
+    }
+    
+    class Coordinator: NSObject, WKNavigationDelegate {
+        func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction, decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
+            if let url = navigationAction.request.url, url.scheme == "tel" {
+                UIApplication.shared.open(url)
+                decisionHandler(.cancel)
+                return
+            }
+            decisionHandler(.allow)
         }
     }
 }
