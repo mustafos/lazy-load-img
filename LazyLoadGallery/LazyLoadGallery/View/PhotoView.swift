@@ -5,7 +5,6 @@
 //  Created by Mustafa Bekirov on 10.09.2025.
 //
 
-// View/PhotoView.swift
 import SwiftUI
 
 struct PhotoView: View {
@@ -19,13 +18,14 @@ struct PhotoView: View {
             if let image {
                 Image(uiImage: image)
                     .resizable()
-                    .scaledToFit()
-                    .frame(maxWidth: .infinity)
+                    .scaledToFill()
+                    .frame(width: targetSize.width, height: targetSize.height)
+                    .clipped()
             } else {
                 RoundedRectangle(cornerRadius: AppTheme.corner)
                     .fill(Color.secondary.opacity(0.08))
                     .overlay(ProgressView())
-                    .aspectRatio(4/3, contentMode: .fit)
+                    .frame(width: targetSize.width, height: targetSize.height)
             }
         }
         .onAppear {
@@ -33,5 +33,6 @@ struct PhotoView: View {
                 image = loader.loadBundledImage(named: name, targetSize: targetSize)
             }
         }
+        .clipShape(RoundedRectangle(cornerRadius: AppTheme.corner, style: .continuous))
     }
 }

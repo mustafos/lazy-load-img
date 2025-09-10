@@ -11,6 +11,7 @@ struct PostCell: View {
     @ObservedObject var vm: PostCellViewModel
     let visibleRatio: CGFloat
     
+    // State
     @State private var isLiked = false
     @State private var likeCount = Int.random(in: 350...9200)
     @State private var showHeart = false
@@ -18,8 +19,13 @@ struct PostCell: View {
     @State private var isMuted = true
     @State private var showMenu = false
     
+    private var mediaW: CGFloat { UIScreen.main.bounds.width - 32 }
+    private var mediaH: CGFloat { mediaW * (16.0 / 9.0) }
+    private var mediaSize: CGSize { .init(width: mediaW, height: mediaH) }
+    
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
+            
             // Header
             HStack(spacing: 12) {
                 AvatarView(initials: vm.post.author.prefix(1).uppercased(), size: 40)
@@ -29,11 +35,11 @@ struct PostCell: View {
                         .font(.footnote).foregroundColor(AppTheme.textSecondary)
                 }
                 Spacer()
-                Button {
-                    showMenu.toggle()
-                } label: {
-                    Image(systemName: "ellipsis").rotationEffect(.degrees(90))
-                        .foregroundColor(AppTheme.textSecondary).padding(8)
+                Button { showMenu.toggle() } label: {
+                    Image(systemName: "ellipsis")
+                        .rotationEffect(.degrees(90))
+                        .foregroundColor(AppTheme.textSecondary)
+                        .padding(8)
                 }
                 .confirmationDialog("Actions", isPresented: $showMenu) {
                     Button("Report", role: .destructive) {}
@@ -44,17 +50,18 @@ struct PostCell: View {
             // Media + double-tap like + heart
             ZStack {
                 content
-                
                 if showHeart {
                     Image(systemName: "heart.fill")
                         .resizable()
-                        .foregroundColor(.red)
+                        .foregroundStyle(.red)
                         .frame(width: 120, height: 120)
                         .scaleEffect(heartScale)
-                        .opacity(0.98)
+                        .opacity(0.95)
                         .shadow(color: .red.opacity(0.35), radius: 12, x: 0, y: 6)
+                        .transition(.scale)
                 }
             }
+            .frame(width: mediaW, height: mediaH)
             .contentShape(Rectangle())
             .onTapGesture(count: 2) { performLikeWithBeat() }
             
@@ -89,26 +96,26 @@ struct PostCell: View {
     @ViewBuilder
     private var content: some View {
         switch vm.post.kind {
+            
         case .photo(let m):
-            PhotoView(
-                name: nameFor(m),
-                targetSize: CGSize(width: UIScreen.main.bounds.width - 32,
-                                   height: (UIScreen.main.bounds.width - 32) * 0.75)
-            )
-            .clipShape(RoundedRectangle(cornerRadius: AppTheme.corner, style: .continuous))
+            PhotoView(name: nameFor(m), targetSize: mediaSize)
+                .frame(width: mediaW, height: mediaH)
+                .clipped()
             
         case .video(let v):
             VideoPlayerCard(name: nameFor(v),
                             shouldPlay: visibleRatio >= 0.25,
                             isMuted: $isMuted)
+            .frame(width: mediaW, height: mediaH)
+            .clipShape(RoundedRectangle(cornerRadius: AppTheme.corner, style: .continuous))
             
         case .mixed(let photo, let video):
-            MediaPagerView(
-                photoName: nameFor(photo),
-                videoName: nameFor(video),
-                visibleRatio: visibleRatio,
-                isMuted: $isMuted
-            )
+            MediaPagerView(photoName: nameFor(photo),
+                           videoName: nameFor(video),
+                           visibleRatio: visibleRatio,
+                           targetSize: mediaSize,
+                           isMuted: $isMuted)
+            .frame(width: mediaW, height: mediaH)
         }
     }
     

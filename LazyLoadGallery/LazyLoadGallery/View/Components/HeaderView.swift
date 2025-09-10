@@ -8,39 +8,28 @@
 import SwiftUI
 
 struct HeaderView: View {
-    let title: String
-    let progress: CGFloat
-    
-    private let maxH: CGFloat = 120
-    private let minH: CGFloat = 56
+    let appName: String
+    var rightIcon: String = "bell"
     
     var body: some View {
-        let h = max(minH, maxH - (maxH - minH) * progress)
-        
         ZStack {
-            RoundedRectangle(cornerRadius: AppTheme.corner, style: .continuous)
-                .fill(AppTheme.card)
-                .shadow(color: AppTheme.shadow.color, radius: AppTheme.shadow.radius, x: 0, y: AppTheme.shadow.y)
+            Text(appName)
+                .font(.title2.bold())
+                .foregroundColor(.primary)
             
             HStack {
                 Spacer()
-                Text(title)
-                    .font(.system(size: lerp(28, 18, progress), weight: .bold))
-                    .foregroundColor(AppTheme.textPrimary)
-                Spacer()
-                Button { /* notifications */ } label: {
-                    Image(systemName: "bell.fill")
-                        .font(.title3)
-                        .foregroundColor(AppTheme.accent)
-                        .padding(10)
+                Button {
+                    // action
+                } label: {
+                    Image(systemName: rightIcon)
+                        .font(.title3.weight(.semibold))
+                        .foregroundColor(.primary)
                 }
             }
-            .padding(.horizontal, 12)
+            .padding(.trailing, 16)
         }
-        .frame(height: h)
-        .padding(.horizontal, 12)
-        .padding(.top, 12)
+        .padding(.vertical, 12)
+        .background(Color.white.ignoresSafeArea(edges: .top))
     }
-    
-    private func lerp(_ a: CGFloat, _ b: CGFloat, _ t: CGFloat) -> CGFloat { a + (b - a) * t }
 }

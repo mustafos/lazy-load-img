@@ -15,30 +15,21 @@ struct FeedView: View {
     var body: some View {
         ZStack(alignment: .bottomTrailing) {
             VStack(spacing: 0) {
-                HeaderView(title: "Feed", progress: headerProgress)
-                    .zIndex(1)
-
+                HeaderView(appName: "Feed")
                 ScrollView {
-                    ScrollOffsetReader()
                     LazyVStack(spacing: 20) {
-                                        ForEach(vm.posts) { cellVM in
-                                            PostCell(vm: cellVM, visibleRatio: vis[cellVM.id] ?? 0)
-                                                .reportVisibility(id: cellVM.id)
-                                        }
-                                        .padding(.top, 8)
-                                    }
-                                    .padding(.bottom, 24)
+                        ForEach(vm.posts) { cellVM in
+                            PostCell(vm: cellVM, visibleRatio: vis[cellVM.id] ?? 0)
+                                .reportVisibility(id: cellVM.id)
+                        }
+                    }
+                    .padding(.top, 8)
                 }
-                .coordinateSpace(name: "feedScroll")
-                            .onPreferenceChange(ScrollOffsetKey.self) { y in
-                                let collapseRange: CGFloat = 64
-                                let p = min(max(-y / collapseRange, 0), 1)
-                                headerProgress = p
-                            }
-                            .onPreferenceChange(VisibilityKey.self) { vis = $0 }
-                            .onAppear { preheatImages(); preheatVideos() }
+                .onPreferenceChange(VisibilityKey.self) { vis = $0 }
+                .onAppear { preheatImages(); preheatVideos() }
             }
-
+            .background(AppTheme.bg.ignoresSafeArea())
+            
             // FAB
             Button { } label: {
                 Image(systemName: "plus")
