@@ -15,24 +15,26 @@ struct MediaPagerView: View {
     
     @State private var page = 0
     
+    private var targetSize: CGSize {
+        let w = UIScreen.main.bounds.width - 32
+        let h = w * 0.75
+        return .init(width: w, height: h)
+    }
+    
     var body: some View {
         TabView(selection: $page) {
-            PhotoView(
-                name: photoName,
-                targetSize: CGSize(width: UIScreen.main.bounds.width - 32,
-                                   height: (UIScreen.main.bounds.width - 32) * 0.75)
-            )
-            .clipShape(RoundedRectangle(cornerRadius: AppTheme.corner, style: .continuous))
-            .tag(0)
+            PhotoView(name: photoName, targetSize: targetSize)
+                .frame(width: targetSize.width, height: targetSize.height)
+                .clipShape(RoundedRectangle(cornerRadius: AppTheme.corner, style: .continuous))
+                .tag(0)
             
-            VideoPlayerCard(
-                name: videoName,
-                shouldPlay: (page == 1) && (visibleRatio >= 0.25),
-                isMuted: $isMuted
-            )
+            VideoPlayerCard(name: videoName,
+                            shouldPlay: (page == 1) && (visibleRatio >= 0.25),
+                            isMuted: $isMuted)
+            .frame(width: targetSize.width, height: targetSize.height)
             .tag(1)
         }
         .tabViewStyle(PageTabViewStyle(indexDisplayMode: .automatic))
-        .frame(maxWidth: .infinity)
+        .frame(height: targetSize.height)
     }
 }
