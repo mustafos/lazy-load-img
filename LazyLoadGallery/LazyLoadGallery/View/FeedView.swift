@@ -51,9 +51,8 @@ struct FeedView: View {
             default: return nil
             }
         }
-        .prefix(3)
-        .map { $0 }
-        
+            .prefix(3)
+            .map { $0 }
         PlayerPool.shared.preheat(keys: Array(videoKeys))
     }
     

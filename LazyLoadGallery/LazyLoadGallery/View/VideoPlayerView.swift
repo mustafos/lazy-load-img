@@ -29,7 +29,7 @@ struct VideoPlayerView: View {
                 player?.pause()
                 PlayerPool.shared.release(key: videoName)
             }
-            .aspectRatio(9/16, contentMode: .fit)
+            .aspectRatio(9.0/16.0, contentMode: .fit)
             .cornerRadius(12)
     }
 }
