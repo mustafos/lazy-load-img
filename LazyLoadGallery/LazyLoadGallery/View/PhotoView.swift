@@ -5,6 +5,7 @@
 //  Created by Mustafa Bekirov on 10.09.2025.
 //
 
+// View/PhotoView.swift
 import SwiftUI
 
 struct PhotoView: View {
@@ -12,16 +13,16 @@ struct PhotoView: View {
     let targetSize: CGSize
     @State private var image: UIImage?
     private let loader = ImageLoader()
-
+    
     var body: some View {
         Group {
             if let image {
                 Image(uiImage: image)
                     .resizable()
                     .scaledToFit()
-                    .frame(maxWidth: .infinity, alignment: .center)
+                    .frame(maxWidth: .infinity)
             } else {
-                Rectangle()
+                RoundedRectangle(cornerRadius: AppTheme.corner)
                     .fill(Color.secondary.opacity(0.08))
                     .overlay(ProgressView())
                     .aspectRatio(4/3, contentMode: .fit)
@@ -32,7 +33,5 @@ struct PhotoView: View {
                 image = loader.loadBundledImage(named: name, targetSize: targetSize)
             }
         }
-        .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
-        .contentShape(Rectangle())
     }
 }

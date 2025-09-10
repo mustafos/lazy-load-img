@@ -12,21 +12,35 @@ struct FeedView: View {
     @State private var vis: [UUID: CGFloat] = [:]
     
     var body: some View {
-        ScrollView {
-            LazyVStack(spacing: 16) {
-                ForEach(vm.posts) { cellVM in
-                    PostCell(vm: cellVM, visibleRatio: vis[cellVM.id] ?? 0)
-                        .reportVisibility(id: cellVM.id)
-                        .padding(.horizontal)
+        ZStack(alignment: .bottomTrailing) {
+            ScrollView {
+                LazyVStack(spacing: 20) {
+                    ForEach(vm.posts) { cellVM in
+                        PostCell(vm: cellVM, visibleRatio: vis[cellVM.id] ?? 0)
+                            .reportVisibility(id: cellVM.id)
+                    }
+                    .padding(.top, 8)
                 }
             }
-        }
-        .onPreferenceChange(VisibilityKey.self) { vis = $0 }
-        .onAppear {
-            preheatImages()
-            preheatVideos()
+            .background(AppTheme.bg.ignoresSafeArea())
+            .onPreferenceChange(VisibilityKey.self) { vis = $0 }
+            .onAppear { preheatImages(); preheatVideos() }
+            
+            Button {
+                // create post
+            } label: {
+                Image(systemName: "plus")
+                    .font(.title2.bold())
+                    .foregroundColor(.white)
+                    .padding(18)
+                    .background(AppTheme.accent, in: Circle())
+                    .shadow(color: AppTheme.accent.opacity(0.35), radius: 16, x: 0, y: 8)
+            }
+            .padding(.trailing, 22)
+            .padding(.bottom, 22)
         }
     }
+    
     
     private func preheatImages() {
         let loader = ImageLoader()
