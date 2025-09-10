@@ -7,8 +7,11 @@
 
 import Foundation
 
-struct Post: Codable, Hashable {
-    let title: String
-    let description: String
-    let imageURL: String
+enum PostKind { case photo(Media), video(Media), mixed(photo: Media, video: Media) }
+
+struct Post: Identifiable {
+    let id = UUID()
+    let kind: PostKind
+    let author: String
+    let caption: String?
 }
