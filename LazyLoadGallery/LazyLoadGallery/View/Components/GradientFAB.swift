@@ -35,9 +35,8 @@ struct GradientFAB: View {
                     .animation(.spring(response: 0.45, dampingFraction: 0.65), value: rotated)
             }
         }
-        .buttonStyle(.bordered)
+        .buttonStyle(.plain)
         .padding(.trailing, 22)
         .padding(.bottom, 22)
     }
 }
-

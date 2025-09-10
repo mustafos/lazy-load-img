@@ -21,16 +21,21 @@ struct VisibilityReporter: ViewModifier {
             .background(
                 GeometryReader { geo in
                     Color.clear
-                        .preference(key: VisibilityKey.self, value: [id: visibleRatio(in: geo)])
+                        .preference(key: VisibilityKey.self,
+                                    value: [id: verticalVisibleRatio(in: geo)])
                 }
             )
+            .transaction { $0.disablesAnimations = true }
     }
-    private func visibleRatio(in geo: GeometryProxy) -> CGFloat {
+    
+    private func verticalVisibleRatio(in geo: GeometryProxy) -> CGFloat {
         let frame = geo.frame(in: .global)
         let screen = UIScreen.main.bounds
         let intersection = frame.intersection(screen)
-        guard !frame.isEmpty else { return 0 }
-        return max(0, min(1, (intersection.height * intersection.width) / (frame.height * frame.width)))
+        guard frame.height > 0 else { return 0 }
+        
+        let ratio = max(0, min(1, intersection.height / frame.height))
+        return (ratio * 20).rounded() / 20
     }
 }
 

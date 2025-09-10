@@ -11,13 +11,15 @@ import AVKit
 struct VideoPlayerView: View {
     let videoName: String
     let shouldPlay: Bool
-
+    
     @State private var player: AVPlayer?
     @State private var isMuted = true
-
+    
     var body: some View {
         ZStack(alignment: .topTrailing) {
             VideoPlayer(player: player)
+                .disabled(true)             
+                .overlay(Color.clear)
                 .onAppear {
                     if player == nil {
                         player = PlayerPool.shared.acquire(key: videoName)
@@ -33,7 +35,7 @@ struct VideoPlayerView: View {
                     PlayerPool.shared.release(key: videoName)
                 }
                 .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
-
+            
             // Mute/unmute button
             Button {
                 isMuted.toggle()

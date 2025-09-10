@@ -17,10 +17,14 @@ struct HeaderView: View {
                 .foregroundColor(.primary)
             
             HStack {
+                Image("pets")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 32, height: 32)
                 Spacer()
                 RingingBellButton()
             }
-            .padding(.trailing, 16)
+            .padding(.horizontal)
         }
         .padding(.vertical, 12)
         .background(Color.white.ignoresSafeArea(edges: .top))

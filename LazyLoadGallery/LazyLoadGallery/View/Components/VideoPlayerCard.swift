@@ -8,38 +8,50 @@
 import SwiftUI
 import AVKit
 
-extension Notification.Name {
-    static let toggleMute = Notification.Name("toggleMutePerPost")
-}
-
-import SwiftUI
-import AVKit
-
 struct VideoPlayerCard: View {
     let name: String
     let shouldPlay: Bool
     @Binding var isMuted: Bool
-
+    
     @State private var player: AVPlayer?
-
+    
     var body: some View {
         ZStack(alignment: .topTrailing) {
-            VideoPlayer(player: player)
-                .onAppear {
-                    if player == nil {
-                        player = PlayerPool.shared.acquire(key: name)
-                        player?.isMuted = isMuted
+            if let player = player {
+                VideoPlayer(player: player)
+                    .disabled(true)
+                    .onAppear {
+                        player.isMuted = isMuted
+                        player.volume = isMuted ? 0 : 1
+                        if shouldPlay { player.play() }
                     }
-                    if shouldPlay { player?.play() }
-                }
-                .onChange(of: shouldPlay) { $0 ? player?.play() : player?.pause() }
-                .onChange(of: isMuted) { player?.isMuted = $0 }
-                .clipShape(RoundedRectangle(cornerRadius: AppTheme.corner, style: .continuous))
-
+                    .onDisappear {
+                        player.pause()
+                        PlayerPool.shared.release(key: name)
+                    }
+                    .onChange(of: shouldPlay) { play in
+                        play ? player.play() : player.pause()
+                    }
+                    .onChange(of: isMuted) { muted in
+                        player.isMuted = muted
+                        player.volume = muted ? 0 : 1
+                    }
+            } else {
+                Color.black
+                    .onAppear {
+                        if let p = PlayerPool.shared.acquire(key: name) {
+                            p.isMuted = isMuted
+                            p.volume  = isMuted ? 0 : 1
+                            player = p
+                            if shouldPlay { p.play() }
+                        }
+                    }
+            }
+            
             MuteButton(isMuted: $isMuted)
                 .padding(10)
         }
-        .aspectRatio(9/16, contentMode: .fit)
+        .clipShape(RoundedRectangle(cornerRadius: AppTheme.corner, style: .continuous))
         .shadow(color: AppTheme.shadow.color.opacity(0.5), radius: 8, x: 0, y: 4)
     }
 }

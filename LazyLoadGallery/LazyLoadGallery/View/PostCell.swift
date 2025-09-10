@@ -10,21 +10,17 @@ import SwiftUI
 struct PostCell: View {
     @ObservedObject var vm: PostCellViewModel
     let visibleRatio: CGFloat
-    
-    @State private var isLiked = false
-    @State private var likeCount = Int.random(in: 350...9200)
+
     @State private var showHeart = false
     @State private var heartScale: CGFloat = 0.2
-    @State private var isMuted = true
-    @State private var showMenu = false
-    
+
     private var mediaW: CGFloat { UIScreen.main.bounds.width - 32 }
     private var mediaH: CGFloat { mediaW * (16.0 / 9.0) }
     private var mediaSize: CGSize { .init(width: mediaW, height: mediaH) }
-    
+
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
-            
+
             // Header
             HStack(spacing: 12) {
                 AvatarView(initials: vm.post.author.prefix(1).uppercased(), size: 40)
@@ -35,17 +31,17 @@ struct PostCell: View {
                         .foregroundColor(AppTheme.textSecondary)
                 }
                 Spacer()
-                Button { showMenu.toggle() } label: {
+                Button { vm.toggleMenu() } label: {
                     Image(systemName: "ellipsis")
                         .rotationEffect(.degrees(90))
                         .foregroundColor(AppTheme.textSecondary)
                 }
-                .confirmationDialog("Actions", isPresented: $showMenu) {
+                .confirmationDialog("Actions", isPresented: $vm.showMenu) {
                     Button("Report", role: .destructive) {}
                     Button("Share") {}
                 }
             }
-            
+
             // Media + double-tap like
             ZStack {
                 content
@@ -61,13 +57,15 @@ struct PostCell: View {
             }
             .frame(width: mediaW, height: mediaH)
             .contentShape(Rectangle())
-            .onTapGesture(count: 2) { performLikeWithBeat() }
-            
+            .onTapGesture(count: 2) { likeWithBeat() }
+
             // Action bar
             HStack(spacing: 20) {
-                MetricButton(system: isLiked ? "heart.fill" : "heart",
-                             title: "\(likeCount)",
-                             activeColor: isLiked ? AppTheme.like : nil) { performLikeWithBeat() }
+                MetricButton(system: vm.isLiked ? "heart.fill" : "heart",
+                             title: "\(vm.likeCount)",
+                             activeColor: vm.isLiked ? AppTheme.like : nil) {
+                    likeWithBeat()
+                }
                 MetricButton(system: "bubble.right", title: "121") {}
                 MetricButton(system: "arrowshape.turn.up.forward", title: "Share") {}
                 Spacer()
@@ -76,11 +74,12 @@ struct PostCell: View {
                         .foregroundColor(AppTheme.textSecondary)
                 }
             }
-            
+
             if let caption = vm.post.caption {
                 Text(caption)
                     .font(.body)
                     .foregroundColor(AppTheme.textPrimary)
+                    .padding([.leading, .bottom], 8)
             }
         }
         .padding(.horizontal, 12)
@@ -94,61 +93,54 @@ struct PostCell: View {
         )
         .padding(.top, 8)
     }
-    
-    // MARK: Content
+
+    // MARK: - Media
     @ViewBuilder
     private var content: some View {
         switch vm.post.kind {
         case .photo(let m):
-            PhotoView(name: nameFor(m), targetSize: mediaSize)
+            PhotoView(name: m.filename, targetSize: mediaSize)
                 .frame(width: mediaW, height: mediaH)
                 .clipped()
+
         case .video(let v):
-            VideoPlayerCard(name: nameFor(v),
+            VideoPlayerCard(name: v.filename,
                             shouldPlay: visibleRatio >= 0.25,
-                            isMuted: $isMuted)
-            .frame(width: mediaW, height: mediaH)
-            .clipShape(RoundedRectangle(cornerRadius: AppTheme.corner, style: .continuous))
+                            isMuted: $vm.isMuted)
+                .frame(width: mediaW, height: mediaH)
+                .clipShape(RoundedRectangle(cornerRadius: AppTheme.corner, style: .continuous))
+
         case .mixed(let photo, let video):
-            MediaPagerView(photoName: nameFor(photo),
-                           videoName: nameFor(video),
+            MediaPagerView(photoName: photo.filename,
+                           videoName: video.filename,
                            visibleRatio: visibleRatio,
                            targetSize: mediaSize,
-                           isMuted: $isMuted)
-            .frame(width: mediaW, height: mediaH)
+                           isMuted: $vm.isMuted)
+                .frame(width: mediaW, height: mediaH)
         }
     }
-    
-    private func nameFor(_ media: Media) -> String {
-        switch media.kind {
-        case .photo(let n), .video(let n): return n
+
+    // MARK: - Like animation (UI)
+    private func likeWithBeat() {
+        let wasLiked = vm.isLiked
+        vm.toggleLike()
+
+        guard !wasLiked else { return }
+        showHeart = true
+        heartScale = 0.2
+
+        withAnimation(.spring(response: 0.22, dampingFraction: 0.55)) { heartScale = 1.25 }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.22) {
+            withAnimation(.spring(response: 0.18, dampingFraction: 0.80)) { heartScale = 0.92 }
         }
-    }
-    
-    // MARK: Like + heartbeat animation
-    private func performLikeWithBeat() {
-        if !isLiked {
-            isLiked = true
-            likeCount += 1
-            UIImpactFeedbackGenerator(style: .medium).impactOccurred()
-            showHeart = true
-            heartScale = 0.2
-            withAnimation(.spring(response: 0.22, dampingFraction: 0.55)) { heartScale = 1.25 }
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.22) {
-                withAnimation(.spring(response: 0.18, dampingFraction: 0.80)) { heartScale = 0.92 }
-            }
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.40) {
-                withAnimation(.spring(response: 0.20, dampingFraction: 0.60)) { heartScale = 1.10 }
-            }
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.62) {
-                withAnimation(.easeOut(duration: 0.20)) { heartScale = 1.0 }
-            }
-            DispatchQueue.main.asyncAfter(deadline: .now() + 1.1) {
-                withAnimation(.easeOut(duration: 0.18)) { showHeart = false }
-            }
-        } else {
-            isLiked = false
-            likeCount = max(0, likeCount - 1)
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.40) {
+            withAnimation(.spring(response: 0.20, dampingFraction: 0.60)) { heartScale = 1.10 }
+        }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.62) {
+            withAnimation(.easeOut(duration: 0.20)) { heartScale = 1.0 }
+        }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.1) {
+            withAnimation(.easeOut(duration: 0.18)) { showHeart = false }
         }
     }
 }

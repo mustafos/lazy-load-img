@@ -1,52 +1,58 @@
-# Lazy Load Gallery
+# 🐾 Catstagram
 
 <p align="center">
-  <img src="https://github.com/mustafos/lazy-load-img/blob/master/Preview.png" alt="Lazy Load Gallery" width="100%"/>
+<img src="https://github.com/mustafos/lazy-load-img/blob/master/Preview.png" alt="Lazy Load Gallery" width="100%"/>
 </p>
 
-## Features
+## ✨ Features
 
-- **Lazy Loading**: Images load only when they are about to appear in the viewport.
-- **Loading Indicators**: Displays a placeholder and loading spinner while images and data are loading.
-- **Error Handling**: Shows an error message with a retry option if the data fetch fails.
-- **Responsive UI**: Uses a grid layout to display images, ensuring a responsive design.
+- **📸 Mixed Media Feed**: Supports photos, videos, and mixed posts with horizontal paging.
+- **▶️ Smart Video Playback**: Videos auto-play when visible and pause when off-screen.
+- **❤️ Like with Animation**: Double-tap to like with smooth heartbeat animation + haptics.
+- **🗂️ Caching & Preheating**: Images downsampled and preheated, videos pooled for reuse.
+- **🎨 Modern UI**: Card-style posts, custom header, floating action button with gradient.
+- **☀️ Light Mode Only**: Clean, consistent design locked to light appearance.
 
 ## Installation
 
 1. **Clone the repository:**
-    ```bash
-    git clone https://github.com/mustafos/lazy-load-img.git
-    cd lazy-load-img
-    ```
+```bash
+git clone https://github.com/mustafos/lazy-load-img.git
+cd lazy-load-img
+```
 
 2. **Open the project in Xcode:**
-    ```bash
-    open lazy-load-img.xcodeproj
-    ```
+```bash
+open lazy-load-img.xcodeproj
+```
 
 3. **Run the application:**
-    - Select the target device or simulator.
-    - Press `Cmd + R` or click the Run button in Xcode.
+- Select a simulator or real device.
+- Press `Cmd + R` or hit the ▶️ Run button.
 
-## Project Structure
+## 📂 Project Structure
 
-- `LazyLoadGalleryApp.swift`: The main entry point of the application.
-- `View/GalleryView.swift`: The main view that initializes and displays the image list.
-- `Model/Post.swift`: The data model representing each image item.
-- `Utils/CacheAsyncImage.swift`: The view for an async image.
-- `ViewModels/NetworkManager.swift`: The view model responsible for fetching and managing image data.
+- `LazyLoadGalleryApp.swift` — app entry point, audio session + scene management.
+- `FeedView.swift` — main scrollable feed.
+- `PostCell.swift` — single post UI (header, media, actions, caption).
+- `MediaPagerView.swift` — horizontal pager for mixed photo + video posts.
+- `PlayerPool.swift` — AVPlayer pool for smooth video reuse.
+- `ImageLoader.swift` — downsampled image loading with caching.
+- `AppTheme.swift` — shared colors, shadows, and layout constants.
 
-## Usage
+## 🎮 Usage
 
-- The application starts by displaying a loader.
-- Once data is fetched, a grid of image cards is displayed.
-- Each image card shows a placeholder until the image is fully loaded.
-- If the data fetch fails, an error message with a retry button is shown.
+- Scroll the feed to view posts.
+- Photos display instantly with lazy downsampled loading.
+- Videos auto-play when at least 25% visible.
+- Double-tap a photo or video to like it — ❤️ animates with a beat.
+- Toggle sound with the mute button in the corner.
 
-## Contribution
+## 🤝 Contribution
 
-Contributions are welcome! Please fork the repository and submit a pull request for any improvements or bug fixes.
+Pull requests are welcome!
+For big changes, open an issue first to discuss what you’d like to add.
 
-## License
+## 📜 License
 
 This project is licensed under the MIT License - see the [LICENSE](https://github.com/mustafos/lazy-load-img/blob/master/LICENSE) file for details.
