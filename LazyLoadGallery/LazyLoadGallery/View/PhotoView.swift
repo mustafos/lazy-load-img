@@ -15,14 +15,24 @@ struct PhotoView: View {
 
     var body: some View {
         Group {
-            if let image { Image(uiImage: image).resizable().scaledToFill() }
-            else { Rectangle().opacity(0.08).overlay(ProgressView()) }
+            if let image {
+                Image(uiImage: image)
+                    .resizable()
+                    .scaledToFit()
+                    .frame(maxWidth: .infinity, alignment: .center)
+            } else {
+                Rectangle()
+                    .fill(Color.secondary.opacity(0.08))
+                    .overlay(ProgressView())
+                    .aspectRatio(4/3, contentMode: .fit)
+            }
         }
         .onAppear {
             if image == nil {
                 image = loader.loadBundledImage(named: name, targetSize: targetSize)
             }
         }
-        .clipped()
+        .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+        .contentShape(Rectangle())
     }
 }

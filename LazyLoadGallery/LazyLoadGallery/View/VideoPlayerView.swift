@@ -13,23 +13,40 @@ struct VideoPlayerView: View {
     let shouldPlay: Bool
 
     @State private var player: AVPlayer?
+    @State private var isMuted = true
 
     var body: some View {
-        VideoPlayer(player: player)
-            .onAppear {
-                if player == nil {
-                    player = PlayerPool.shared.acquire(key: videoName)
+        ZStack(alignment: .topTrailing) {
+            VideoPlayer(player: player)
+                .onAppear {
+                    if player == nil {
+                        player = PlayerPool.shared.acquire(key: videoName)
+                        player?.isMuted = isMuted
+                    }
+                    if shouldPlay { player?.play() }
                 }
-                if shouldPlay { player?.play() }
+                .onChange(of: shouldPlay) { play in
+                    play ? player?.play() : player?.pause()
+                }
+                .onDisappear {
+                    player?.pause()
+                    PlayerPool.shared.release(key: videoName)
+                }
+                .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+
+            // Mute/unmute button
+            Button {
+                isMuted.toggle()
+                player?.isMuted = isMuted
+                UIImpactFeedbackGenerator(style: .light).impactOccurred()
+            } label: {
+                Image(systemName: isMuted ? "speaker.slash.fill" : "speaker.wave.2.fill")
+                    .font(.caption)
+                    .padding(8)
+                    .background(.ultraThinMaterial, in: Circle())
             }
-            .onChange(of: shouldPlay) { play in
-                play ? player?.play() : player?.pause()
-            }
-            .onDisappear {
-                player?.pause()
-                PlayerPool.shared.release(key: videoName)
-            }
-            .aspectRatio(9.0/16.0, contentMode: .fit)
-            .cornerRadius(12)
+            .padding(10)
+        }
+        .aspectRatio(9/16, contentMode: .fit)
     }
 }

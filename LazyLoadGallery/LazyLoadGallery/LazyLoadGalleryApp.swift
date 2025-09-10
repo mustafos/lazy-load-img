@@ -15,3 +15,5 @@ struct LazyLoadGalleryApp: App {
         }
     }
 }
+
+// feat(feed): polish post cell UI, fix image sizing, add like+Haptic and mute toggle
