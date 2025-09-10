@@ -10,7 +10,7 @@ import SwiftUI
 struct VisibilityKey: PreferenceKey {
     static var defaultValue: [UUID: CGFloat] = [:]
     static func reduce(value: inout [UUID: CGFloat], nextValue: () -> [UUID: CGFloat]) {
-        value.merge(nextValue()) { $2 }
+        value.merge(nextValue(), uniquingKeysWith: { _, new in new })
     }
 }
 
