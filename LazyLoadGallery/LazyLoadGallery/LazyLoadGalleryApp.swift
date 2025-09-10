@@ -11,7 +11,7 @@ import SwiftUI
 struct LazyLoadGalleryApp: App {
     var body: some Scene {
         WindowGroup {
-            GalleryView()
+            PhotoView()
         }
     }
 }

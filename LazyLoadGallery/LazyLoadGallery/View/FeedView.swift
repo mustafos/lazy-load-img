@@ -22,7 +22,10 @@ struct FeedView: View {
             }
         }
         .onPreferenceChange(VisibilityKey.self) { vis = $0 }
-        .onAppear { preheatImages() }
+        .onAppear {
+            preheatImages()
+            preheatVideos()
+        }
     }
     
     private func preheatImages() {
@@ -38,6 +41,20 @@ struct FeedView: View {
             default: break
             }
         }
+    }
+    
+    private func preheatVideos() {
+        let videoKeys: [String] = vm.posts.compactMap {
+            switch $0.post.kind {
+            case .video(let m): return nameFor(m)
+            case .mixed(_, let v): return nameFor(v)
+            default: return nil
+            }
+        }
+        .prefix(3)
+        .map { $0 }
+        
+        PlayerPool.shared.preheat(keys: Array(videoKeys))
     }
     
     private func nameFor(_ media: Media) -> String {
