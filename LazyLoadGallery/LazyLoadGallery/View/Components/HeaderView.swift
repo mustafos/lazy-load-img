@@ -9,7 +9,6 @@ import SwiftUI
 
 struct HeaderView: View {
     let appName: String
-    var rightIcon: String = "bell"
     
     var body: some View {
         ZStack {
@@ -19,13 +18,7 @@ struct HeaderView: View {
             
             HStack {
                 Spacer()
-                Button {
-                    // action
-                } label: {
-                    Image(systemName: rightIcon)
-                        .font(.title3.weight(.semibold))
-                        .foregroundColor(.primary)
-                }
+                RingingBellButton()
             }
             .padding(.trailing, 16)
         }

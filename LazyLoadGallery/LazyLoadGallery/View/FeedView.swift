@@ -25,22 +25,19 @@ struct FeedView: View {
                     }
                     .padding(.top, 8)
                 }
+                .scrollIndicators(.hidden)
                 .onPreferenceChange(VisibilityKey.self) { vis = $0 }
                 .onAppear { preheatImages(); preheatVideos() }
+                .refreshable {
+                    withAnimation {
+                        preheatImages(); preheatVideos()
+                    }
+                }
             }
             .background(AppTheme.bg.ignoresSafeArea())
             
             // FAB
-            Button { } label: {
-                Image(systemName: "plus")
-                    .font(.title2.bold())
-                    .foregroundColor(.white)
-                    .padding(18)
-                    .background(AppTheme.accent, in: Circle())
-                    .shadow(color: AppTheme.accent.opacity(0.35), radius: 16, x: 0, y: 8)
-            }
-            .padding(.trailing, 22)
-            .padding(.bottom, 22)
+            GradientFAB()
         }
         .background(AppTheme.bg.ignoresSafeArea())
         .onAppear { preheatImages(); preheatVideos() }
